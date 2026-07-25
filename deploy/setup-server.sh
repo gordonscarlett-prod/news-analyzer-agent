@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/gordonscarlett-prod/news-analyzer-agent.git"   # <-- EDIT THIS (use a PAT in the URL if the repo is private)
+REPO_URL="git@github.com:gordonscarlett-prod/news-analyzer-agent.git"   # private repo — cloned via a read-only GitHub deploy key on this instance
 APP_DIR="/opt/news-analyzer"
 
 echo "==> Installing system packages..."
