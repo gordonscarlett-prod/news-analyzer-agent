@@ -103,7 +103,14 @@ def _score_batch(batch: list[dict]) -> dict[int, list[dict]]:
         for block in response.content:
             if block.type == "tool_use" and block.name == "submit_scores":
                 results = block.input.get("results", [])
-                return {r["article_index"]: r.get("sectors", []) for r in results}
+                scored = {}
+                for r in results:
+                    idx = r.get("article_index")
+                    if idx is None:
+                        logger.warning(f"Skipping a scored result with no article_index: {r}")
+                        continue
+                    scored[idx] = r.get("sectors", [])
+                return scored
     except Exception as e:
         logger.error(f"Claude scoring batch failed: {e}")
     return {}
