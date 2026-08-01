@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from database import SessionLocal
 from models import Article, ArticleScore, DailySectorScore, DailyMarketScore, RunLog
-from sources import finnhub_client, newsapi_client
+from sources import finnhub_client, newsapi_client, marketaux_client, fred_client
 from scoring import score_articles, write_daily_narrative
 from aggregator import compute_sector_scores, compute_overall_score, group_scores_by_sector
 
@@ -21,6 +21,14 @@ def _fetch_and_store_articles(db) -> list[Article]:
         raw.extend(newsapi_client.fetch_news())
     except Exception as e:
         logger.error(f"NewsAPI fetch error: {e}")
+    try:
+        raw.extend(marketaux_client.fetch_news())
+    except Exception as e:
+        logger.error(f"Marketaux fetch error: {e}")
+    try:
+        raw.extend(fred_client.fetch_news())
+    except Exception as e:
+        logger.error(f"FRED fetch error: {e}")
 
     new_articles = []
     for item in raw:

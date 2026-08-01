@@ -25,6 +25,13 @@ For each article, decide which sector(s) it materially affects (usually 0-2, rar
 has no plausible equity-market relevance (e.g. pure human interest, sports, entertainment gossip), return \
 an empty sectors list for it.
 
+Some items are macro economic data releases (e.g. CPI, unemployment, Fed funds rate) rather than headlines — \
+these include the prior reading for comparison. Judge them by the surprise/direction of the change relative \
+to the prior value, and treat broad macro releases (inflation, employment, rate decisions) as affecting the \
+whole market rather than a single sector — apply them across the relevant sectors (e.g. Financials for rate \
+moves, or multiple/all sectors for a broad inflation or employment surprise) rather than skipping them for \
+lack of a single obvious sector.
+
 For each sector you assign to an article, provide:
 - sentiment: float from -1 (very bearish for that sector) to 1 (very bullish)
 - impact: float from 0 (negligible) to 10 (major market-moving event, e.g. Fed policy shift, major regulatory \

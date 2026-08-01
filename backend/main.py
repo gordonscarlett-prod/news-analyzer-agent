@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from datetime import datetime
 from typing import Optional
 from zoneinfo import ZoneInfo
@@ -108,16 +108,18 @@ def get_articles(
     db: Session = Depends(get_db),
 ):
     date_str = date or _today()
-    query = db.query(Article, ArticleScore).join(ArticleScore, ArticleScore.article_id == Article.id)
-    query = query.filter(ArticleScore.impact >= min_impact)
+    effective_date = func.date(func.coalesce(Article.published_at, Article.fetched_at))
+    query = (
+        db.query(Article, ArticleScore)
+        .join(ArticleScore, ArticleScore.article_id == Article.id)
+        .filter(ArticleScore.impact >= min_impact)
+        .filter(effective_date == date_str)
+    )
     if sector:
         query = query.filter(ArticleScore.sector == sector)
 
     results = []
     for article, score in query.order_by(desc(ArticleScore.impact)).limit(200).all():
-        published = article.published_at.strftime("%Y-%m-%d") if article.published_at else article.fetched_at.strftime("%Y-%m-%d")
-        if published != date_str:
-            continue
         results.append({
             "id": article.id,
             "title": article.title,
