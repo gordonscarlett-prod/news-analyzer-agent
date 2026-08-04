@@ -7,5 +7,6 @@ export const getSectorTrend = (sector, days = 30) => api.get(`/sectors/${encodeU
 export const getArticles = (params) => api.get('/articles', { params }).then(r => r.data)
 export const runNow = () => api.post('/run-now').then(r => r.data)
 export const getStatus = () => api.get('/status').then(r => r.data)
+export const getEtfQuotes = () => api.get('/etf-quotes').then(r => r.data)
 
 export default api

@@ -3,7 +3,7 @@ import { RefreshCw } from 'lucide-react'
 import { getDailyScore, runNow, getStatus } from '../api'
 import { scoreToColors, scoreLabel } from '../scoreColor'
 import SectorHeatmap from '../components/SectorHeatmap'
-import GdeltWordCloud from '../components/GdeltWordCloud'
+import EtfHeatmap from '../components/EtfHeatmap'
 
 export default function Dashboard() {
   const [data, setData] = useState(null)
@@ -87,7 +87,7 @@ export default function Dashboard() {
         <SectorHeatmap sectors={data.sectors} date={data.date} />
       </div>
 
-      <GdeltWordCloud />
+      <EtfHeatmap />
     </div>
   )
 }

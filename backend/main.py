@@ -10,9 +10,10 @@ import logging
 
 from database import init_db, get_db
 from models import Article, ArticleScore, DailySectorScore, DailyMarketScore, RunLog
-from sectors import SECTORS
+from sectors import SECTORS, SECTOR_ETF, SECTOR_WEIGHT
 from scheduler import start_scheduler, stop_scheduler
 from pipeline import run_pipeline
+from sources.finnhub_client import fetch_sector_quotes
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -98,6 +99,25 @@ def get_sector_trend(sector: str, days: int = 30, db: Session = Depends(get_db))
         "sector": sector,
         "points": [{"date": r.date, "composite_score": r.composite_score, "article_count": r.article_count} for r in rows],
     }
+
+
+@app.get("/api/etf-quotes")
+def get_etf_quotes():
+    """Live quote (price + daily % change) for each of the 11 sector-proxy ETFs."""
+    quotes = fetch_sector_quotes(SECTOR_ETF)
+    etfs = []
+    for sector in SECTORS:
+        ticker = SECTOR_ETF[sector]
+        q = quotes.get(sector) or {}
+        etfs.append({
+            "sector": sector,
+            "ticker": ticker,
+            "price": q.get("c"),
+            "change": q.get("d"),
+            "percent_change": q.get("dp"),
+            "weight": SECTOR_WEIGHT.get(sector, 0),
+        })
+    return {"etfs": etfs}
 
 
 @app.get("/api/articles")
